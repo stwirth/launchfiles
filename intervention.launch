@@ -1,0 +1,8 @@
+<launch>
+  <include file="$(find trident_experiments)/CIRS-2012-09/launch/stereo_down.launch" />
+  <include file="$(find object_detection)/launch/object_detector.launch" />
+  <include file="$(find fugu_configurations)/launch/common/motor_board.launch">
+    <arg name="standalone" value="true"/>
+  </include>
+  <include file="$(find fugu_configurations)/launch/common/alarm.launch" />
+</launch>
