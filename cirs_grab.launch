@@ -1,0 +1,27 @@
+<launch>
+  <include file="$(find fugu_configurations)/launch/stereo_camera.launch">
+    <arg name="stereo" value="camera_flex_narrow" />
+    <arg name="base_topic" value="stereo_forward" />
+    <arg name="configuration" value="boxed_air" />
+  </include>
+
+  <node name="stereo_image_proc" pkg="stereo_image_proc" type="stereo_image_proc" ns="stereo_forward">
+    <param name="disparity_range" value="128" />
+    <param name="correlation_window_size" value="15" />
+  </node>
+
+<!--
+  <node pkg="rosbag" type="rosbag" name="rosbag" output="screen" args="record --split --size=1000 -o '$(find bagfiles)/cirs/free3d'
+      /stereo_forward/left/image_raw
+      /stereo_forward/left/camera_info
+      /stereo_forward/right/image_raw
+      /stereo_forward/right/camera_info"
+  />
+-->
+
+  <node pkg="viso2_ros" type="stereo_odometer" name="viso2">
+    <remap from="stereo" to="stereo_forward" />
+    <remap from="image" to="image_raw" />
+  </node>
+
+</launch>

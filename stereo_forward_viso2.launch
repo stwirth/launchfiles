@@ -1,0 +1,22 @@
+<launch>
+  <include file="$(find fugu_configurations)/launch/stereo_camera.launch">
+    <arg name="stereo" value="camera_flex_narrow" />
+    <arg name="base_topic" value="stereo_forward" />
+    <arg name="configuration" value="boxed_air" />
+    <arg name="standalone" value="true" />
+  </include>
+
+  <node name="stereo_image_proc" pkg="stereo_image_proc" type="stereo_image_proc" ns="stereo_forward">
+    <param name="disparity_range" value="128" />
+    <param name="correlation_window_size" value="15" />
+  </node>
+
+  <node pkg="viso2_ros" type="stereo_odometer" name="viso2" output="screen">
+    <remap from="stereo" to="stereo_forward" />
+    <remap from="image" to="image_rect_color" />
+  </node>
+
+  <node name="tf_pub" type="static_transform_publisher" pkg="tf"
+    args="0 0 0 1.5708 0 -1.5708 /base_link /stereo_forward 100" />
+
+</launch>

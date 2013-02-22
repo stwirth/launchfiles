@@ -1,0 +1,28 @@
+<launch>
+  <arg name="stereo" value="stereo_down" />
+
+  <param name="/use_sim_time" value="true" />
+
+  <node name="stereo_image_proc" pkg="stereo_image_proc" 
+        type="stereo_image_proc" ns="$(arg stereo)">
+    <param name="disparity_range" value="128" />
+    <param name="correlation_window_size" value="15" />
+  </node>
+
+  <node pkg="viso2_ros" type="stereo_odometer" name="viso2_stereo_odometer" output="screen">
+    <param name="base_link_frame_id" value="viso2"/>
+    <remap from="stereo" to="$(arg stereo)" />
+    <remap from="image" to="image_rect" />
+  </node>
+
+  <node pkg="fovis_ros" type="stereo_odometer" name="fovis_stereo_odometer" output="screen">
+    <param name="base_link_frame_id" value="fovis"/>
+    <remap from="stereo" to="$(arg stereo)" />
+    <remap from="image" to="image_rect" />
+  </node>
+
+  <node name="map_to_odom" type="static_transform_publisher" pkg="tf"
+    args="0 0 0 1.5708 3.1416 0 /map /odom 100" />
+
+</launch>
+

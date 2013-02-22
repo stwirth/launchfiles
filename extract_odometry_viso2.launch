@@ -1,0 +1,34 @@
+<launch>
+  <arg name="bagfile" />
+  <arg name="outfile" />
+  <arg name="stereo" value="stereo_down" />
+
+  <param name="/use_sim_time" value="true" />
+
+  <node pkg="rosbag" type="play" name="rosbag" output="screen" 
+    args="--clock -d 5 $(arg bagfile)" required="true"/>
+
+  <node name="stereo_image_proc" pkg="stereo_image_proc" 
+        type="stereo_image_proc" ns="$(arg stereo)">
+    <param name="disparity_range" value="128" />
+    <param name="correlation_window_size" value="15" />
+  </node>
+
+  <node pkg="viso2_ros" type="stereo_odometer" name="stereo_odometer" output="screen">
+    <remap from="stereo" to="$(arg stereo)" />
+    <remap from="image" to="image_rect" />
+  </node>
+
+  <node name="tf_pub" type="static_transform_publisher" pkg="tf"
+    args="0 0 0 0 0 0 /base_link $(arg stereo)_optical 100" />
+
+  <node name="tf_pub2" type="static_transform_publisher" pkg="tf"
+    args="0 0 0 0 0 0 /base_link $(arg stereo) 100" />
+
+  <node name="logger" type="executer.py" pkg="launch_tools">
+    <param name="command" value="rostopic echo -p /stereo_odometer/odometry" />
+    <param name="stdout_file" value="$(arg outfile)"/>
+  </node>
+
+</launch>
+

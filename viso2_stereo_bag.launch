@@ -1,0 +1,29 @@
+<launch>
+  <arg name="stereo" value="camera_comp_wide" />
+
+  <param name="/use_sim_time" value="true" />
+
+  <node pkg="rosbag" type="rosbag" name="rosbag" output="screen" 
+    args="play --clock -d 5 $(arg bagfile)" />
+
+  <node name="stereo_image_proc" pkg="stereo_image_proc" 
+        type="stereo_image_proc" ns="$(arg stereo)">
+    <param name="disparity_range" value="128" />
+    <param name="correlation_window_size" value="15" />
+  </node>
+
+  <node pkg="viso2_ros" type="stereo_odometer" name="viso2" output="screen">
+    <remap from="stereo" to="$(arg stereo)" />
+    <remap from="image" to="image_rect" />
+  </node>
+
+  <node name="tf_pub" type="static_transform_publisher" pkg="tf"
+    args="0 0 -0.1 3.1416 1.43 0 /base_link /camera_comp_wide_cam 100" />
+
+  <node name="tf_pub2" type="static_transform_publisher" pkg="tf"
+    args="0 0.06 0 -1.5708 0 -1.5708 /camera_comp_wide_cam /camera_comp_wide 100" />
+
+  <node name="depth" type="depth" pkg="depth" ns="motor_board"/>
+
+</launch>
+

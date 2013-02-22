@@ -1,0 +1,36 @@
+<launch>
+
+  <arg name="points" />
+
+  <!-- throttle -->
+  <node name="points_throttle" pkg="topic_tools" type="throttle"
+    args="messages $(arg points) 1.0 /throttled/$(arg points)" />
+
+ <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+  <!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
+  <node pkg="nodelet" type="nodelet" name="throttled_voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/throttled/$(arg points)" />
+    <remap from="~output" to="/throttled_reduced/$(arg points)" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.4
+      filter_limit_max: 10.0
+      filter_limit_negative: False
+      leaf_size: 0.02
+    </rosparam>
+  </node>
+  <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="$(arg points)" />
+    <remap from="~output" to="/reduced/$(arg points)" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.4
+      filter_limit_max: 10.0
+      filter_limit_negative: False
+      leaf_size: 0.02
+    </rosparam>
+  </node>
+
+</launch>
+

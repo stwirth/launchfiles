@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="UWSim" type="UWSim" name="UWSim" args="--configfile $(find UWSim)/data/scenes/cirs.xml" />
+</launch>
